@@ -1,0 +1,45 @@
+2/10/2021
+
+Review
+Simulation model - set of assumptions concerning the operation of the system, expressed as mathematical, logical, and symbolic expressions between the object of interests (entities) of the system
+
+What is a system?
+Entity - object of interest in the system
+Attribute: property of an entity
+Activity: predefined set of actions in a specified time period
+State of system: collections of variables that describes the system at any time
+Event: Instantaneous occurence that may be associated with change of system state
+System Environment: region outside the system that influences system behavior. (How do we choose the boundary?)
+
+Mcdonalds simulation
+
+Objective: minimize the delay experienced by the customers waiting to be served
+Performance: Delay in Queues (Lines)
+Alternative Designs:
+	    Number of servers
+	    Architecture of queueing system
+	    		 One line shared by all custormers vs individual lines for each server
+			 Pipelining orders? One server takes orders, one serves, one cashier?
+Simulation outcome: predict the delay performance of the real system based on the model
+
+Attributes
+-Source: arrival distribution for customers
+-Queue: physical length limitation; queue behavior
+-Server: distribution of service time
+
+Actions
+-How to best describe actions: use flowcharts
+-Actions are the response of modules to events
+-Source: Waitfor specified time between arrivals, then generate another arrival
+-Server: serve the current customer at the head of the line
+
+State of the System
+-We are interested in variables that influence the delay performance
+-Length of queues
+-State of servers: busy idle
+
+Events
+-Change the state variable
+-Recall: Discrete time system, events only occur at discrete times
+-Arrivals
+-Departures
