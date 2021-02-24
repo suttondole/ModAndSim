@@ -1,0 +1,115 @@
+					Omnet++ NED basics
+					2/24/2021
+
+Used for a high level description of the system/network
+Basic unit - simple module
+-simple modules are active components, they are declared using the keyword simple
+-You can specify parameters, gates
+Example:
+
+simple Queue
+{
+	parameters:
+		int capacity;
+		@class(mylib::Queue);
+		@display("i=block/queue");
+	gates:
+		input in;
+		input out;
+}
+
+Collection of modules and connections:
+
+network Network
+{
+	types:
+		channel c extends ned.DatarateChannel {
+			datarate = 100Mbps;
+		}
+	submodules:
+		node1: Node;
+		node2: Node;
+		node3: Node;
+
+	connections:
+		node1.port++ <--> C <--> node2.port++;
+		node2.port++ <--> C <--> node4.port++;
+		node4.port++ <--> C <--> node6.port++;
+
+Node type declaration could be
+
+simple Node
+{
+	gates:
+		inout(keyword for bidirectional gate) port(your name for the gate)[](defines a vector of gates at
+		unspecified length);
+
+Connections
+Sometimes it is necessary to define characteristics for connecions, such as delay, bit error rate or packet error rate
+Three different data channels are defined in OMNET++ library:
+-if no channel type is specified, the type of channel is automatically selectetd based on the characteristics specified
+-Examples:
+Ideal channel: no delay, no BER, no PER -> default if no characteristics are specified
+If delay or disabled is specified -> ned.DelayChannel is selected by default
+If datarate, ber or per is assigned, ned.DatarateChannel will be chosen. 
+if other parameter names are assigned in a connection without an explicit channel type, you will get be an error (e.g. “ned.DelayChannel has no such parameter” or a similar message).
+You can also define a customized channel type
+
+Channel types
+
+IdealChannel:
+-no parameters, lets through all messages without delay or any side
+
+DelayChannel has two parameters:
+-delay is a double parameter which represents the propagation delay of the message. Values need to be specified together with a time unit (s, ms, us, etc..)
+-disabled is a boolean parameter that defaults to false; when set to true, the channel object will drop all messages
+
+DatarateChannel has additional parameters when compared to DelayChannel:
+-datarate is a double parameter that represents the bandwidth of the channel, and it is used for calculating the transmission duration of packets. Values need to be specified with bits per second or its multiples as unit( bps, kbps, etc..)
+-Zero -> results in zero transmission duration -> stands for infinite bandwidth. it is the default value.
+-ber and per -> basic error modeling: Bit Error Rate and Packet Error Rate.
+--Expected values: double in the [0; 1] range. 
+--When the channel decides (based on random numbers) that an error occurred during transmission a packet, it sets an error flag in the packet object. 
+--The receiver module is expected to check the flag, and discard the packet as corrupted if it is set. The default values for ber and per are zero.
+
+Example for setting up connections parameters
+
+network Network
+{
+	types:
+	channel C extends ned.DatarateChannel{
+	datarate = 100Mbps;
+	}
+	submodules:
+	node1: Node;
+	node2: Node;
+	node3: Node;
+	....
+	connections:
+	node1.port++<-->{delay = 10ms;}<-->node2.port++;
+	node2.port++<-->{delay = 10ms;, datarate = 100Mbps;}<-->node4.port++;
+	node4.port++<-->C<-->node6.port++;
+	...
+}
+
+You can use a for loop to connect modules:
+
+module Chain
+       parameters:
+		int count;
+       submodules:
+		node[count] : Node {
+			    gates:
+				port[2];
+		}
+	connections allowunconnected:
+		    for i = 0..count - 2{
+		    	node[i].port[1] <--node[i+1]. port[0];
+		}
+}
+
+
+Connections and gates:
+-In general all gates need to be connected
+-Exceptions may be needed(see connectionAndGatesException in repo)
+
